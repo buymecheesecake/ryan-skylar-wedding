@@ -13,11 +13,11 @@ function drawChapel() {
   const src = mobile ? 'assets/chapel/portrait.jpg' : 'assets/chapel/landscape.jpg';
   // Paths trace the actual door edges in the two separately composed artworks.
   const left = mobile
-    ? 'M 210 793 L 210 403 Q 210 350 500 322 L 500 793 Z'
-    : 'M 372 906 L 372 329 Q 372 250 500 230 L 500 906 Z';
+    ? 'M 210 793 L 210 403 C 210 358 365 322 500 322 L 500 793 Z'
+    : 'M 372 906 L 372 329 C 372 269 435 230 500 230 L 500 906 Z';
   const right = mobile
-    ? 'M 500 322 Q 790 347 795 403 L 795 793 L 500 793 Z'
-    : 'M 500 230 Q 620 250 625 329 L 625 906 L 500 906 Z';
+    ? 'M 500 322 C 635 322 795 358 795 403 L 795 793 L 500 793 Z'
+    : 'M 500 230 C 565 230 625 269 625 329 L 625 906 L 500 906 Z';
   const image = `<image href="${src}" width="1000" height="1000" preserveAspectRatio="none"/>`;
   art.innerHTML = `<svg viewBox="0 0 1000 1000" preserveAspectRatio="none"><defs><mask id="facade-mask"><rect width="1000" height="1000" fill="white"/><path d="${left} ${right}" fill="black"/></mask></defs><g mask="url(#facade-mask)">${image}</g></svg>` +
     [['left', left], ['right', right]].map(([side, path]) => `<svg class="door ${side}" viewBox="0 0 1000 1000" preserveAspectRatio="none"><defs><clipPath id="${side}-clip"><path d="${path}"/></clipPath></defs><g clip-path="url(#${side}-clip)">${image}</g></svg>`).join('');
@@ -91,3 +91,15 @@ document.querySelector('.lightbox-close').addEventListener('click', () => lightb
 lightbox.addEventListener('click', event => { if (event.target === lightbox || event.target === lightbox.querySelector('figure')) lightbox.close(); });
 lightbox.addEventListener('close', () => { document.body.classList.remove('viewing-photo'); lastPhotoButton?.focus({preventScroll:true}); });
 showEntrance();
+
+const albumCover = document.querySelector('.album-cover');
+const secondRoll = document.querySelector('#second-roll');
+function toggleAlbum(open) {
+ document.querySelector('.memory-album').classList.toggle('is-open', open);
+ albumCover.setAttribute('aria-expanded', String(open));
+ secondRoll.hidden = !open;
+ if (open) { secondRoll.setAttribute('tabindex', '-1'); secondRoll.focus({preventScroll:true}); secondRoll.scrollIntoView({behavior:reduceMotion.matches ? 'instant' : 'smooth', block:'start'}); }
+ else albumCover.focus({preventScroll:true});
+}
+albumCover.addEventListener('click', () => toggleAlbum(true));
+document.querySelector('.close-album').addEventListener('click', () => toggleAlbum(false));
